@@ -1,75 +1,74 @@
-DEPENDENCIES
-First of all you are going to need to have the komodod daemon and the assetchains running.
-Install dependency packages:
-sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib autoconf libtool libncurses5-dev unzip git python zlib1g-dev wget bsdmainutils automake libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libqt4-dev libqrencode-dev libdb++-dev ntp ntpdate vim software-properties-common curl libcurl4-gnutls-dev cmake clang
-Some Linux machines are now providing nanomsg package version 1.0. If it is available via package manager, you can install it from there. Else, you should use github repo of nanomsg and compile it yourself.
-For Ubuntu 14.04 you need to install it yourself
-cd /tmp
-wget https://github.com/nanomsg/nanomsg/archive/1.0.0.tar.gz -O nanomsg-1.0.0.tar.gz
-tar -xzvf nanomsg-1.0.0.tar.gz
-cd nanomsg-1.0.0
-mkdir build
-cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr
-cmake --build .
-sudo cmake --build . --target install
-sudo ldconfig
-Or the following for 16.04
-git clone https://github.com/nanomsg/nanomsg
-cd nanomsg
-cmake .
-make
-sudo make install
-sudo ldconfig
-COMPILE LP NODE
-To compile the BarterDEX you need to build iguana one time:
-cd ~
-git clone https://github.com/jl777/SuperNET
-cd SuperNET/iguana
-git checkout dev
-./m_LP
-IGUANA DAEMON STARTUP
-Then launch the iguana daemon by executing: 
-../agents/iguana &
-Now iguana should be running and providing port 7778 API: 127.0.0.1:7778 page in the browser will show the API testpage, but for marketmaker these functions are not used very much. it is port 7779 that is used and the marketmaker program is what provides those functions.
-BarterDEX EXCHANGE INSTALL
-cd ~/SuperNET/iguana/exchanges 
-./install
-Now, move to ~/SuperNET/iguana/dexscripts:
-cd ~/SuperNET/iguana/dexscripts
-Now in the ~/SuperNET/iguana/dexscripts directory you will have example scripts that you can change without new git updates overwriting them. These scripts will have example commands that you will need to customize to work with the coins you want to trade. Of course, if a new update to a script is made and you dont run install again then you wont have the latest versions. 
-For example: if you want to enable the JUMBLR coin, you need to edit the enable file:
-nano ~SuperNET/iguana/dexscripts/enable
-copy the default command and paste it below but with the coin edited to JUMBLR in this case:
-curl --url "http://127.0.0.1:7779" --data "{\"userpass\":\"$userpass\",\"method\":\"enable\",\"coin\":\"JUMBLR\"}"
-The same will happen for any other script in the dexscripts directory. You will need to edit the scripts to include or exclude the coins you want to trade.
-IMPORTANT: All these scripts are expecting a userpass file, which contains the definition of the $userpass variable to authenticate API access. This avoids evil webpages that try to issue port 7779 calls to steal your money. At first you wont know the value of userpass. To find out, just run any API script. The first one will return all the required data, the "userpass" field is first and you can copy that value and put it into ~/SuperNET/iguana/dexscripts/userpass file. If you dont, all subsequent API calls will get authorization errors.The userpass variable is linked to each passphrase and that is defined in the randval file. Put your passphrase in that file. You can find templates for these two files in the iguana/exchanges dir. (you need to copy the edited version of these files to ~/SuperNET/iguana/dexscripts).
-cd ~/SuperNET/iguana/dexscripts
-./enable 
-(look for the userpass passphrase that will be generated and copy it)
-Now you have to paste the passphrase in both userpass and randval files:
-nano ./userpass 
-nano ./randval
-( paste the passphrase generated into the files where it says: “<put the userpass value from the first API call here>”)
-EXCHANGE CLIENT STARTUP
-Next step is to actually start the marketmaker from ~/SuperNET/iguana/dexscripts. 
- cd ~/SuperNET/iguana/dexscripts
- ./client (for client mode) or
- ./run (for LPnode mode)
-Assuming you created the userpass file properly, you can now issue barterDEX api calls using all the scripts in the dexscripts dir. Please look at these scripts, they are simple curl invocations of a couple lines. Nothing scary and should be self explanatory.
-The help script displays all the api endpoints you should need. You can customize any of the dexscripts for your desired usage, make sure you edit them with the right coins, as if you issue a script for BTC it will do it for BTC instead of the coin you wanted. These scripts wont read your mind, they just do what is in them
-FUNDING SMARTADDRESS
-In order to start trading, you need to fund your smartaddress (as listed on the first API call return) from the getcoins API call. 
-To see which is your smart address go to ~/SuperNET/iguana/dexscritps and execute:
-./getcoins
-To make sure you have utxo pairs for both the bob and alice usage, it is best to send utxo in triplets of X, 1.2 X and 0.01 X. So if X is 10, send 10, 12, and 0.1 coins using sendtoaddress to your smartaddress. This means you will have to send 3 different transactions to the same address with 3 different quantities
-for example: 
-If i want to fund my komodo smartaddress with 100 komodo i need to first send a tx with 100kmd then another tx with 120kmd and a third tx with only 10kmd
-After this, it should appear in the inventory. To see the inventory you need to execute:
-./inv
-SETTING PRICE
- To set price you need to edit the ./setprice script in the dexscripts folder. This scripts contains a curl command that looks like this: 
-curl --url "http://127.0.0.1:7779" --data "{\"userpass\":\"$userpass\",\"method\":\"setprice\",\"base\":\"REVS\",\"rel\":\"KMD\",\"price\":1.234}"
-In this command you should edit the coin (in this case is REVS) and then set the price per coin based in Komodo. In the command above we are setting a price of 1.23KMD per REVS.
-After you setprice (./setprice), then it will appear in orderbooks with that coin in either the base or rel.
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><!--This file was converted to xhtml by LibreOffice - see http://cgit.freedesktop.org/libreoffice/core/tree/filter/source/xslt for the code.--><head profile="http://dublincore.org/documents/dcmi-terms/"><meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/><title xml:lang="en-US">- no title specified</title><meta name="DCTERMS.title" content="" xml:lang="en-US"/><meta name="DCTERMS.language" content="en-US" scheme="DCTERMS.RFC4646"/><meta name="DCTERMS.source" content="http://xml.openoffice.org/odf2xhtml"/><meta name="DCTERMS.issued" content="2017-07-01T12:11:53.627117621" scheme="DCTERMS.W3CDTF"/><meta name="DCTERMS.modified" content="2017-07-02T15:55:10.902614952" scheme="DCTERMS.W3CDTF"/><meta name="DCTERMS.provenance" content="" xml:lang="en-US"/><meta name="DCTERMS.subject" content="," xml:lang="en-US"/><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" hreflang="en"/><link rel="schema.DCTERMS" href="http://purl.org/dc/terms/" hreflang="en"/><link rel="schema.DCTYPE" href="http://purl.org/dc/dcmitype/" hreflang="en"/><link rel="schema.DCAM" href="http://purl.org/dc/dcam/" hreflang="en"/><style type="text/css">
+	@page {  }
+	table { border-collapse:collapse; border-spacing:0; empty-cells:show }
+	td, th { vertical-align:top; font-size:12pt;}
+	h1, h2, h3, h4, h5, h6 { clear:both }
+	ol, ul { margin:0; padding:0;}
+	li { list-style: none; margin:0; padding:0;}
+	<!-- "li span.odfLiEnd" - IE 7 issue-->
+	li span. { clear: both; line-height:0; width:0; height:0; margin:0; padding:0; }
+	span.footnodeNumber { padding-right:1em; }
+	span.annotation_style_by_filter { font-size:95%; font-family:Arial; background-color:#fff000;  margin:0; border:0; padding:0;  }
+	* { margin:0;}
+	.Heading_20_4 { font-size:12pt; margin-bottom:0.0835in; margin-top:0.0835in; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P1 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P10 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P11 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P12 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P13 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P14 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P15 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P16 { font-size:12pt; font-family:FreeMono; writing-mode:page; font-style:normal; text-decoration:underline; }
+	.P17 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P18 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P19 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P2 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P20 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P21 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P22 { font-size:12pt; font-family:FreeMono; writing-mode:page; font-weight:normal; }
+	.P23 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P24 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P25 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P26 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P27 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:normal; }
+	.P28 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:normal; }
+	.P29 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P3 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P30 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P31 { font-size:12pt; line-height:120%; margin-bottom:0.0972in; margin-top:0in; font-family:Liberation Serif; writing-mode:page; font-weight:normal; }
+	.P32 { font-size:12pt; margin-bottom:0in; margin-top:0in; font-family:FreeMono; writing-mode:page; }
+	.P33 { font-size:12pt; margin-bottom:0in; margin-top:0in; font-family:FreeMono; writing-mode:page; }
+	.P34 { font-size:12pt; margin-bottom:0.1965in; margin-top:0in; font-family:FreeMono; writing-mode:page; }
+	.P35 { font-size:12pt; margin-bottom:0.1965in; margin-top:0in; font-family:Liberation Mono; writing-mode:page; }
+	.P36 { font-size:12pt; font-weight:bold; margin-bottom:0.1965in; margin-top:0in; font-family:Liberation Serif; writing-mode:page; }
+	.P37 { font-size:12pt; font-family:FreeMono; writing-mode:page; font-style:normal; text-decoration:underline; }
+	.P38 { font-size:12pt; font-family:FreeMono; writing-mode:page; }
+	.P4 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P40 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P41 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P42 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P43 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P44 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P45 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; font-weight:normal; }
+	.P47 { font-size:12pt; margin-bottom:0in; margin-top:0in; font-family:FreeMono; writing-mode:page; font-style:normal; text-decoration:underline; }
+	.P5 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P6 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P7 { font-size:12pt; font-family:Liberation Serif; writing-mode:page; }
+	.P8 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.P9 { font-size:14pt; font-family:Liberation Serif; writing-mode:page; font-weight:bold; }
+	.Emphasis { font-style:italic; }
+	.Internet_20_link { color:#000080; text-decoration:underline; }
+	.T10 { font-family:FreeMono; }
+	.T11 { font-family:FreeMono; }
+	.T14 { font-weight:normal; }
+	.T2 { font-weight:bold; }
+	.T3 { font-weight:bold; }
+	.T4 { font-weight:bold; }
+	.T5 { font-size:14pt; font-weight:bold; }
+	.T7 { font-family:FreeMono; }
+	.T8 { font-family:FreeMono; }
+	.T9 { font-family:FreeMono; }
+	<!-- ODF styles with no properties representable as CSS -->
+	.T1 .T12 .T13 .T15 .T16 .T17 .T18 .T19 .T6  { }
+	</style></head><body dir="ltr" style="max-width:8.5in;margin-top:0.7874in; margin-bottom:0.7874in; margin-left:0.7874in; margin-right:0.7874in; "><p class="P11">DEPENDENCIES</p><p class="P11"> </p><p class="P45">First of all you are going to need to have the komodod <span class="T19">(</span><a href="https://github.com/jl777/komodo" class="Internet_20_link"><span class="T19">https://github.com/jl777/komodo</span></a><span class="T19">) </span>daemon and the assetchains running.</p><p class="P11"> </p><p class="P26">Install dependency packages:</p><p class="P27"> </p><p class="P33"><span class="T14">sudo apt-get install build-essential pkg-config libc6-dev m4 </span>g++-multilib autoconf libtool <span class="T18">lib</span>ncurses<span class="T18">5</span>-dev unzip git python zlib1g-dev wget bsdmainutils automake libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libqt4-dev libqrencode-dev libdb++-dev ntp ntpdate vim software-properties-comm<span class="T12">on </span>curl libcurl4-gnutls-dev cmake clang</p><p class="P28"> </p><p class="P28"> </p><p class="P31">Some Linux machines are now providing <span class="Emphasis">nanomsg</span> package version 1.0. If it is available via package manager, you can install it from there. Else, you should use github repo of nanomsg and compile it yourself.</p><h4 class="Heading_20_4"><a id="a__For_Ubuntu_14_04_you_need_to_install_it_yourself"><span/></a><a id="user-content-for-ubuntu-1404-you-need-to-install-it-yourself"/>For Ubuntu 14.04 you need to install it yourself</h4><p class="P32"> </p><p class="P32">cd /tmp</p><p class="P32">wget https://github.com/nanomsg/nanomsg/archive/1.0.0.tar.gz -O nanomsg-1.0.0.tar.gz</p><p class="P32">tar -xzvf nanomsg-1.0.0.tar.gz</p><p class="P32">cd nanomsg-1.0.0</p><p class="P32">mkdir build</p><p class="P32">cd build</p><p class="P32">cmake .. -DCMAKE_INSTALL_PREFIX=/usr</p><p class="P32">cmake --build .</p><p class="P32">sudo cmake --build . --target install</p><p class="P34">sudo ldconfig</p><h4 class="P36"><a id="a__Or_the_following_for_16_04"><span/></a>Or the following for 16.04</h4><p class="P32"> </p><p class="P32">git clone https://github.com/nanomsg/nanomsg</p><p class="P32">cd nanomsg</p><p class="P32">cmake .</p><p class="P32">make</p><p class="P32">sudo make install</p><p class="P34">sudo ldconfig</p><p class="P35"> </p><p class="P8"> </p><p class="P8"/><p class="P8"><span class="T13">COMPILE </span>LP NODE</p><p class="P1"> </p><p class="P2">To <span class="T13">compile </span>the BarterDEX you need to build iguana one time<span class="T1">:</span></p><p class="P20"> </p><p class="P47">cd ~</p><p class="P32">git clone https://github.com/jl777/SuperNET</p><p class="P32">cd SuperNET/iguana</p><p class="P32">git checkout dev</p><p class="P34">./m_LP</p><p class="P37"> </p><p class="P1"> </p><p class="P1"> </p><p class="P8">IGUANA DAEMON STARTUP</p><p class="P1"> </p><p class="P2">Then launch the iguana daemon by executing: </p><p class="P2"> </p><p class="P16">../agents/iguana &amp;</p><p class="P1"> </p><p class="P1">Now iguana should be running and providing port 7778 API: 127.0.0.1:7778 page in the browser will show the API testpage, but for marketmaker these functions are not used very much. it is port 7779 that is used and the marketmaker program is what provides those functions.</p><p class="P1"> </p><p class="P1"> </p><p class="P9">BarterDEX EXCHANGE INSTALL</p><p class="P1"> </p><p class="P1"><span class="T8">cd</span><span class="T7"> ~/SuperNET/iguana/exchanges</span> </p><p class="P1"> </p><p class="P17">./install</p><p class="P1"> </p><p class="P1">Now, move to ~/SuperNET/iguana/dexscripts:</p><p class="P1"> </p><p class="P18">cd ~/SuperNET/iguana/dexscripts</p><p class="P1"> </p><p class="P1">Now in the ~/SuperNET/iguana/dexscripts directory you will have example scripts that you can change without new git updates overwriting them. These scripts will have example commands that <span class="T5">you will need to customize to work with the coins you want to trade</span>. Of course, if a new update to a script is made and you dont run install again then you wont have the latest versions. </p><p class="P1"> </p><p class="P15"><span class="T2">For example</span>: if you want to enable the JUMBLR coin, you need to edit the enable file:</p><p class="P15"> </p><p class="P19">nano ~SuperNET/iguana/dexscripts/enable</p><p class="P15"> </p><p class="P15">copy the default command and paste it below but with the coin edited to JUMBLR in this case:</p><p class="P15"> </p><p class="P19">curl --url "http://127.0.0.1:7779" --data "{\"userpass\":\"$userpass\",\"method\":\"enable\",\"coin\":\"JUMBLR\"}"</p><p class="P15"/><p class="P15">The same will happen for any other script in the dexscripts directory. You will need to edit the scripts to include or exclude the coins you want to trade.</p><p class="P1"> </p><p class="P4"><span class="T5">IMPORTANT</span>: All these scripts are expecting a <span class="T2">userpass file</span>, which contains the definition of the $userpass variable to authenticate API access. This avoids evil webpages that try to issue port 7779 calls to steal your money. At first you wont know the value of userpass. To find out, just run any API script. The first one will return all the required data, the "userpass" field is first and you can copy that value and put it into ~/SuperNET/iguana/dexscripts/userpass file. If you dont, all subsequent API calls will get authorization errors.The userpass variable is linked to each passphrase and that is defined in the randval file. Put your passphrase in that file. You can find templates for these two files in the iguana/exchanges dir. <span class="T4">(y</span><span class="T3">ou need to copy the edited version of these files to ~/SuperNET/iguana/dexscripts</span><span class="T4">)</span><span class="T1">.</span></p><p class="P2"> </p><p class="P43"><span class="T11">cd </span><span class="T7">~/SuperNET/iguana/dexscripts</span></p><p class="P43"><span class="T7">./enable </span></p><p class="P44">(look for the userpass passphrase that will be generated and copy it)</p><p class="P14"> </p><p class="P40">Now you have to paste the passphrase in both userpass and randval files:</p><p class="P40"> </p><p class="P42"><span class="T8">nano ./userpass </span></p><p class="P43"><span class="T7">nano ./</span><span class="T11">randval</span></p><p class="P41">( paste the passphrase generate<span class="T18">d</span> into the file<span class="T17">s</span> where it says: “&lt;put the userpass value from the first API call here&gt;”<span class="T6">)</span></p><p class="P41"> </p><p class="P10">EXCHANGE CLIENT STARTUP</p><p class="P10"> </p><p class="P3">Next step is to actually start the marketmaker from ~/SuperNET/iguana/dexscripts. </p><p class="P3"> </p><p class="P5"><span class="T10"> cd </span><span class="T7">~/</span><span class="T9">SuperNET/iguana/dexscripts</span></p><p class="P38"> </p><p class="P5"><span class="T9"> ./client</span><span class="T6"> (for client mode) or</span></p><p class="P3"> </p><p class="P3"><span class="T9"> ./run</span><span class="T6"> (for LPnode mode)</span></p><p class="P3"> </p><p class="P1"> </p><p class="P1">Assuming you created the userpass file properly, you can now issue barterDEX api calls using all the scripts in the dexscripts dir. Please look at these scripts, they are simple curl invocations of a couple lines. Nothing scary and should be self explanatory.</p><p class="P1"> </p><p class="P1">The help script displays all the api endpoints you should need. You can customize any of the dexscripts for your desired usage, make sure you edit them with the right coins, as if you issue a script for BTC it will do it for BTC instead of the coin you wanted. These scripts wont read your mind, they just do what is in them</p><p class="P1"> </p><p class="P12">FUNDING SMARTADDRESS</p><p class="P12"> </p><p class="P6">In order to start trading, you need to fund your smartaddress (as listed on the first API call return) from the getcoins API call. </p><p class="P6"/><p class="P29"> </p><p class="P29"> </p><p class="P29">To see which is your smart address go to ~/SuperNET/iguana/dexscritps and execute:</p><p class="P29"> </p><p class="P21">./getcoins</p><p class="P6"> </p><p class="P6">To make sure you have utxo pairs for both the bob and alice usage, it is best to send utxo in triplets of X, 1.2 X and 0.01 X. So if X is 10, send 10, 12, and 0.1 coins using sendtoaddress to your smartaddress. <span class="T15">This means you will have to send 3 different transactions to the same address with 3 different quantities</span></p><p class="P6"> </p><p class="P24">for example: </p><p class="P24"> </p><p class="P24">If i want to fund my komodo smartaddress with 100 komodo i need to first send a tx with 100kmd then another tx with 120kmd and a third tx with only 10kmd</p><p class="P29"> </p><p class="P6">After this, it should appear in the inventory. <span class="T15">To see the inventory you need to execute:</span></p><p class="P6"> </p><p class="P22">./<span class="T15">inv</span></p><p class="P25"> </p><p class="P13">SETTING PRICE</p><p class="P13"> </p><p class="P7"> <span class="T16">To set price you need to edit the ./setprice script in the dexscripts folder. This scripts contains a curl command that looks like this: </span></p><p class="P7"> </p><p class="P23">curl --url "http://127.0.0.1:7779" --data "{\"userpass\":\"$userpass\",\"method\":\"setprice\",\"base\":\"REVS\",\"rel\":\"KMD\",\"price\":1.234}"</p><p class="P7"> </p><p class="P30">In this command you should edit the coin (in this case is REVS) and then set the price per coin based in Komodo. In the command above we are setting a price of 1.23KMD per REVS.</p><p class="P7"> </p><p class="P7">After you setprice <span class="T15">(./setprice)</span>, then it will appear in orderbooks with that coin in either the base or rel.</p><p class="P1"> </p><p class="P1"> </p><p class="P4"> </p></body></html>
